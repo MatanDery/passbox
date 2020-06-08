@@ -2,6 +2,10 @@ from tkinter import *
 from tkinter import ttk
 from backend import Back
 from Crypto.Cipher import AES
+from hashlib import sha1
+from binascii import hexlify
+from requests import get
+
 
 class popup_dec():
     def __init__(self):
@@ -46,9 +50,6 @@ class popup_dec():
                         f.write(data)
                         return
 
-
-
-
 popup_dec()
 
 back_db =Back()
@@ -74,8 +75,8 @@ class Ui():
         self.entry_pass = Entry(textvariable=self.entry_pass_val)
         self.entry_pass.grid(row=2, column=1)
 
-        self.cred_list = Listbox(main_window, height=30, width=80, )
-        self.cred_list.grid(row=5, column=0, rowspan=10, columnspan=4)
+        self.cred_list = Listbox(main_window, height=30, width=100, )
+        self.cred_list.grid(row=5, column=0, rowspan=10, columnspan=9)
 
 
         view_all_button = Button(main_window, text='View All', command=self.view_all_wrap)
@@ -96,8 +97,12 @@ class Ui():
         enc_button = Button(main_window, text='Encrypt DB', command=self.enc)
         enc_button.grid(row=4, column=10)
 
-        enc_button = Button(main_window, text='Search Password', command=self.find_passwd)
-        enc_button.grid(row=4, column=4)
+        src_passwd_button = Button(main_window, text='Search Password', command=self.find_passwd)
+        src_passwd_button.grid(row=4, column=4)
+
+        chk_passwd_button = Button(main_window, text='check Password', command=self.chack_safe_pass)
+        chk_passwd_button.grid(row=2, column=2)
+
 
 
     def enc(self):
@@ -144,6 +149,24 @@ class Ui():
         for row in exists:
             self.cred_list.insert(END, row)
 
+    def chack_safe_pass(self):
+        self.cred_list.delete(0, END)
+        curpasswd = self.entry_pass_val.get()
+        curpasswd = hexlify(sha1(curpasswd.encode()).digest()).decode().upper()
+        try:
+            x = get(f'https://api.pwnedpasswords.com/range/{curpasswd[:5]}')
+        except:
+            self.cred_list.insert(END, 'bad response')
+            return
+        res = x.content.decode().split('\r\n')
+        for i in res:
+            if curpasswd[5:] in i:
+                i = i.split(':')
+                self.cred_list.insert(END, f'Bad Password Leaked {i[1]} times')
+                return
+        else:
+            self.cred_list.insert(END, 'Good Password!!! never leaked before')
+            return
 
 
 main_window = Tk()

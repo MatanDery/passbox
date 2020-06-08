@@ -1,5 +1,5 @@
 import sqlite3
-from hashlib import sha256         # can be used with sha-1 https://haveibeenpwned.com/API/v3
+from hashlib import sha256
 from binascii import hexlify
 
 class Back:
