@@ -6,8 +6,7 @@ from hashlib import sha1
 from binascii import hexlify
 from requests import get
 
-global my_iv
-my_iv =b'abcdefghijklmnop'
+MY_IV =b'abcdefghijklmnop'
 
 class popup_dec():
     def __init__(self):
@@ -42,7 +41,7 @@ class popup_dec():
             else:
                 f.close()
                 with open('creds.db', 'wb') as f:
-                    enc_data = AES.new(key, AES.MODE_CBC, iv=my_iv)
+                    enc_data = AES.new(key, AES.MODE_CBC, iv=MY_IV)
                     enc_data = enc_data.decrypt(data)
                     #print(enc_data)
                     if enc_data[:15] == b'SQLite format 3':
@@ -130,7 +129,7 @@ class Ui():
             else:
                 f.close()
                 with open('creds.db', 'wb') as f:
-                    enc_data = AES.new(key, AES.MODE_CBC, iv=my_iv)
+                    enc_data = AES.new(key, AES.MODE_CBC, iv=MY_IV)
                     enc_data = enc_data.encrypt(data)
                     f.write(enc_data)
                     quit()
