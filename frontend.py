@@ -23,7 +23,7 @@ class popup_dec():
         self.pass_dec = StringVar()
         self.entry_pass = Entry(textvariable=self.pass_dec)
         self.entry_pass.pack()
-        b1 = ttk.Button(self.popup, text="Okay", command = self.dec)
+        b1 = ttk.Button(self.popup, text="Okay", command=self.dec)
         b1.pack()
         self.popup.mainloop()
 
@@ -40,9 +40,9 @@ class popup_dec():
             else:
                 f.close()
                 with open('creds.db', 'wb') as f:
-                    enc_data = AES.new(key, AES.MODE_ECB)
+                    enc_data = AES.new(key, AES.MODE_CBC, iv=b'abcdefghijklmnop')
                     enc_data = enc_data.decrypt(data)
-                    print(enc_data)
+                    #print(enc_data)
                     if enc_data[:15] == b'SQLite format 3':
                         f.write(enc_data)
                         self.popup.destroy()
@@ -51,8 +51,16 @@ class popup_dec():
                         return
 
 popup_dec()
+try:
+    with open('creds.db', 'rb') as f:
+        data = f.read()
+        if data[:15] == b'SQLite format 3':
+            back_db = Back()
+        else:
+            quit()
+except FileNotFoundError:
+    back_db = Back()
 
-back_db =Back()
 
 class Ui():
     def __init__(self, main_window):
@@ -120,7 +128,7 @@ class Ui():
             else:
                 f.close()
                 with open('creds.db', 'wb') as f:
-                    enc_data = AES.new(key, AES.MODE_ECB)
+                    enc_data = AES.new(key, AES.MODE_CBC, iv=b'abcdefghijklmnop')
                     enc_data = enc_data.encrypt(data)
                     f.write(enc_data)
                     quit()
@@ -172,7 +180,4 @@ class Ui():
 main_window = Tk()
 Ui(main_window)
 main_window.mainloop()
-
-
-
 

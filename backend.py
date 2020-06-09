@@ -13,8 +13,9 @@ class Back:
     def add_entry_to_table(self, site, user, passwd):
         salt = site
         pepper = 'qwerty'
-        passwd = salt + passwd + pepper
-        passwd = hexlify(sha256(passwd.encode()).digest())
+        passwd = (salt + passwd + pepper).encode()
+        for i in range(100000):
+            passwd = hexlify(sha256(passwd).digest())
         x = self.cur.execute("SELECT * FROM users where site=(?) AND name=(?) AND passwd=(?)", (site, user, passwd))
         if len(x.fetchall()) > 0 :
             return 'ALREADY EXISTS'
@@ -43,8 +44,9 @@ class Back:
             site, user, curpasswd = i[0], i[1], i[2]
             salt = site
             pepper = 'qwerty'
-            check_passwd = salt + passwd + pepper
-            check_passwd = hexlify(sha256(check_passwd.encode()).digest())
+            check_passwd = (salt + passwd + pepper).encode()
+            for j in range(100000):
+                check_passwd = hexlify(sha256(check_passwd).digest())
             if check_passwd == curpasswd:
                 exists.append(i)
         return exists
@@ -52,21 +54,4 @@ class Back:
     def quit_db(self):
         self.con.close()
 
-
-
-# con = sqlite3.connect('creds.db')
-# cur = con.cursor()
-# user='matan543'
-# site='alibaba'
-# passwd='P@ssw0rd'
-# print(cur.execute("SELECT * FROM users ").fetchall())
-# con.commit()
-# con.close()
-# create_table()
-# add_entry_to_table(site,user,passwd)
-# add_entry_to_table(site+'123', user, passwd)
-# add_entry_to_table(site+'456', user, passwd)
-# view_table()
-# view_entry('alibaba123')
-# edit_entry_site("alibaba123","google.com")
 
